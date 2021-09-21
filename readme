@@ -1,0 +1,27 @@
+docker run -ti --privileged=true --name=temporal \
+    -v /home/mauricio/luks/container.img:/container.img \
+    -v $(pwd)/decrypted:/decrypted \
+    mauricioprado00/cryptocontainer:latest sh
+
+
+docker run -ti --privileged=true --name=temporal \
+    -v /home/mauricio/luks/container.img:/container.img \
+    --mount src=`pwd`/decrypted,target=/decrypted,type=bind \
+    mauricioprado00/cryptocontainer:latest sh
+    
+cp container.img cryptocontainer.img
+losetup /dev/loop0 cryptocontainer.img 
+cryptsetup luksOpen /dev/loop0 mycontainer
+fdisk -l /dev/mapper/mycontainer
+dmsetup create mycontainer1 --table '0 198656 linear /dev/mapper/mycontainer 2048'
+
+mkdir /decrypted/content
+mount /dev/mapper/mycontainer1 /decrypted/content
+
+umount /dev/mapper/mycontainer1
+rmdir /decrypted/content
+dmsetup remove mycontainer1
+cryptsetup luksClose mycontainer
+losetup -d /dev/loop0
+
+rm cryptocontainer.img

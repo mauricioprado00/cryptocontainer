@@ -1,0 +1,37 @@
+# docker run -ti --privileged=true --name=temporal -v /home/mauricio/luks/container.img:/container.img -v $(pwd)/decrypted:/decrypted alpine sh
+cp container.img cryptocontainer.img
+losetup /dev/loop0 cryptocontainer.img 
+cryptsetup luksOpen /dev/loop0 mycontainer
+apk add --update cryptsetup
+cryptsetup luksOpen /dev/loop0 mycontainer
+fdisk -l /dev/mapper/mycontainer
+ls -lah /dev/mapper/
+dmsetup create mycontainer1 --table '0 198656 linear /dev/mapper/mycontainer 2048'
+apk add --update dmsetup
+apk add zfs
+modprobe zfs
+zpool
+zpool list
+modprobe zfs
+history -w /dev/stdout
+apk add --update lvm2
+dmsetup
+lvm ls
+lvm help
+lvm pvscan
+lvm lvscan
+lvm help | grep scan
+lvm help 2>&1 | grep scan
+lvm lvmdiskscan
+lvm vgscan
+apk add --update device-mapper
+dmsetup create mycontainer1 --table '0 198656 linear /dev/mapper/mycontainer 2048'
+mkdir /tmp/encrypted-data
+mount /dev/mapper/mycontainer1 /tmp/encrypted-data
+ls -lah /tmp/encrypted-data/
+umount /dev/mapper/mycontainer1
+rmdir /tmp/encrypted-data
+dmsetup remove mycontainer1
+cryptsetup luksClose mycontainer
+losetup -d /dev/loop0
+history -w /dev/stdout
